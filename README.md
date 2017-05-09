@@ -1,3 +1,9 @@
+# This is a tutorial for Jerry's node project, originated from: Ethan Brown's "Web Development with Node and Express"
+这是Jerry的 Node Project 教程范例，参考自Ethan Brown's的同名例子
+origin: https://github.com/EthanRBrown/web-development-with-node-and-express
+
+The original README.MD content is as followed - 以下是原README.MD:
+-----------------------------------------------------------------
 # Web Development With Node And Express
 
 This is the companion repository to [Web Development With Node and Express, 1st Edition](http://shop.oreilly.com/product/0636920032977.do).  With this repository, you can follow along with any of the code samples in the book, as well as see additional material that wasn't appropriate for the book format.
