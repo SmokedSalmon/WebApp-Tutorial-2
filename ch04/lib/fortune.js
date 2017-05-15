@@ -6,6 +6,8 @@ var fortuneCookies = [
 	"Whenever possible, keep it simple.",
 ];
 
+// This "exports" object will be returned by the "require" method, thus exposing
+// methods and properties as specified
 exports.getFortune = function() {
 	var idx = Math.floor(Math.random() * fortuneCookies.length);
 	return fortuneCookies[idx];
