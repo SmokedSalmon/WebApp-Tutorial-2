@@ -2,11 +2,12 @@ var express = require('express');
 
 var app = express();
 
-// set up handlebars view engine
+// === Begin to set up handlebars view engine
 var handlebars = require('express-handlebars')
 	.create({ defaultLayout:'main' });
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
+// === End setting up handlebars view engine
 
 app.set('port', process.env.PORT || 3000);
 
@@ -20,12 +21,14 @@ var fortuneCookies = [
 	"Whenever possible, keep it simple.",
 ];
 
+// use "app.get" to process home and about page routing
 app.get('/', function(req, res) {
 	res.render('home');
 });
 app.get('/about', function(req,res){
 	var randomFortune = 
 		fortuneCookies[Math.floor(Math.random() * fortuneCookies.length)];
+        // Notice how the view engine takes parameters as Context
 	res.render('about', { fortune: randomFortune });
 });
 
