@@ -1,3 +1,4 @@
+// use https instead of http
 var https = require('https'),
 	express = require('express'),
 	fortune = require('./lib/fortune.js'),
@@ -421,6 +422,7 @@ app.use(function(err, req, res, next){
 
 var server;
 
+// Attaches the certification file and key file for the use of https protocol
 function startServer() {
 	var keyFile = __dirname + '/ssl/meadowlark.pem',
 		certFile = __dirname + '/ssl/meadowlark.crt';
