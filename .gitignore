@@ -6,13 +6,33 @@ node_modules*
 .DS_Store
 
 # we don't want to accidentally check our secret credentials into the repo
-credentials.js
+# But adds it to my own repository for localhost development environment
+# credentials.js
 
 # don't commit log files
 log
+npm-debug.log
 
 # ignore uploaded data
 data
 
 # don't store SSL certs in repo!
-ssl
+# But adds it to my own repository for localhost development environment
+# ssl
+
+# ignore IDE project-management directories
+# Here omits the NetBeans project-related docutments
+nbproject*
+/ch03/nbproject/private/
+/ch04/nbproject/private/
+/ch05/nbproject/private/
+/ch08/nbproject/private/
+/ch08-jquery-file-upload/nbproject/private/
+/ch09/nbproject/private/
+/ch12/nbproject/private/
+/ch13/nbproject/private/
+/ch15/nbproject/private/
+/ch14/nbproject/private/
+/ch16/nbproject/private/
+/ch17/nbproject/private/
+/ch18/nbproject/private/
