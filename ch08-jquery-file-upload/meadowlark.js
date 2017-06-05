@@ -1,6 +1,7 @@
 var express = require('express'),
 	fortune = require('./lib/fortune.js'),
 	formidable = require('formidable'),
+        // include the jQuery-File-upload middleware module
 	jqupload = require('jquery-file-upload-middleware');
 
 var app = express();
@@ -70,6 +71,8 @@ app.use(function(req, res, next){
 // jQuery File Upload endpoint middleware
 app.use('/upload', function(req, res, next){
     var now = Date.now();
+    // please refer to the module documentation:
+    // https://www.npmjs.com/package/jquery-file-upload-middleware
     jqupload.fileHandler({
         uploadDir: function(){
             return __dirname + '/public/uploads/' + now;

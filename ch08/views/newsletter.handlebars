@@ -30,6 +30,9 @@
                 evt.preventDefault();
                 var action = $(this).attr('action');
                 var $container = $(this).closest('.formContainer');
+                // the data parameter takes the serialized infomation as query string
+                // from the form, which will be parsed into the res.body in 
+                // server-end
                 $.ajax({
                     url: action,
                     type: 'POST',

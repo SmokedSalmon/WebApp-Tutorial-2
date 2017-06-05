@@ -21,6 +21,7 @@ app.set('view engine', 'handlebars');
 app.set('port', process.env.PORT || 3000);
 
 app.use(express.static(__dirname + '/public'));
+// Use body-parser middleware, so that the request body will be parsed into res.body
 app.use(require('body-parser')());
 
 // set 'showTests' context property if the querystring contains test=1
@@ -107,10 +108,19 @@ app.get('/newsletter', function(req, res){
     res.render('newsletter', { csrf: 'CSRF token goes here' });
 });
 app.post('/process', function(req, res){
+    // Detects if the client is expecting a json data response
     if(req.xhr || req.accepts('json,html')==='json'){
+        // The request is AJAX, send back JSON data as response.
         // if there were an error, we would send { error: 'error description' }
         res.send({ success: true });
     } else {
+        //The request is not AJAX, most likely HTML, then redirct to a page.
+//        // Here data is passed through queryString
+//        console.log( 'Form (from querystring): ' + req.query.form );
+//        // Data is passed via hidden/visible form field
+//        console.log( 'CSRF token (from hidden form field): ' + req.body._csrf );
+//        console.log( 'Name (from visible form field): ' + req.body.name);
+//        console.log( 'Email (from visible form field): ' + req.body.email);
         // if there were an error, we would redirect to an error page
         res.redirect(303, '/thank-you');
     }
@@ -119,13 +129,22 @@ app.get('/contest/vacation-photo', function(req, res){
     var now = new Date();
     res.render('contest/vacation-photo', { year: now.getFullYear(), month: now.getMonth() });
 });
+// :year and :month are route parameters, which will be discussed in Chapter 14
+// For now, they are given by server-end when user visit the page, then passed to
+// the <form> action attribute and returned upon submit
 app.post('/contest/vacation-photo/:year/:month', function(req, res){
+    // In this chapter, the data and file in the form simplely got parsed by
+    // formidable middleware, NO actual storing step is taken. You can see the file's
+    // path is still within this Application's running cache.
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files){
         if(err) return res.redirect(303, '/error');
         console.log('received fields:');
         console.log(fields);
         console.log('received files:');
+        // from here you can view all the infomation for uploaded files, based on
+        // which you can further process them to adopt database-store or data 
+        // cloud-hosting
         console.log(files);
         res.redirect(303, '/thank-you');
     });
