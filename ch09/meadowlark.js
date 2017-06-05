@@ -22,10 +22,13 @@ app.set('view engine', 'handlebars');
 
 app.set('port', process.env.PORT || 3000);
 
+// The credential.js here uses the hard-coded cookie secret, just for demonstation
+// sake, as the credential.js is user related, should be omitted from source
 app.use(require('cookie-parser')(credentials.cookieSecret));
 app.use(require('express-session')({
     resave: false,
     saveUninitialized: false,
+    // link to the indentificating cookie
     secret: credentials.cookieSecret,
 }));
 app.use(express.static(__dirname + '/public'));
@@ -133,7 +136,11 @@ var VALID_EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z
 
 app.post('/newsletter', function(req, res){
 	var name = req.body.name || '', email = req.body.email || '';
-	// input validation
+	// Frontend input validation, backend validation is also essential, more
+        // on that in following chapters
+        // the validated state will be passed in the session, then transfered to
+        // the req.local app context. A bootstrap flash alert plugin will detect
+        // this context and prompt if the flash flag exists
 	if(!email.match(VALID_EMAIL_REGEX)) {
 		if(req.xhr) return res.json({ error: 'Invalid name email address.' });
 		req.session.flash = {
@@ -179,6 +186,14 @@ app.post('/contest/vacation-photo/:year/:month', function(req, res){
         console.log(files);
         res.redirect(303, '/thank-you');
     });
+});
+
+// Demonstrates basic cookie manipulation using response object
+// To see cookies' value you need to check browser's developer tool
+app.get('/cookieTest', function(req, res){
+    res.cookie( 'monster', "monster's cookie" );
+    res.cookie( "signed salmon", "VIP salmon's cookie", {signed: true} );
+    res.redirect(303, '/');
 });
 
 // 404 catch-all handler (middleware)
