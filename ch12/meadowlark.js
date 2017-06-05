@@ -25,11 +25,23 @@ app.set('view engine', 'handlebars');
 
 app.set('port', process.env.PORT || 3000);
 
+// To see requests are handled by different appliction instance.
+app.use(function(req,res,next){
+    var cluster = require('cluster');
+    if(cluster.isWorker) {
+        console.log('Worker %d received request', cluster.worker.id);
+    }
+    next();
+});
+
+// Create a domain object, a monitor where all error/exceptions spwaned during 
+// request-routing can be contained and seen to. Notice this middleware should be
+// added before all request routing, it follows only the multi-thread initialization
 // use domains for better error handling
 app.use(function(req, res, next){
     // create a domain for this request
     var domain = require('domain').create();
-    // handle errors on this domain
+    // define errors handler on this domain
     domain.on('error', function(err){
         console.error('DOMAIN ERROR CAUGHT\n', err.stack);
         try {
@@ -39,6 +51,10 @@ app.use(function(req, res, next){
                 process.exit(1);
             }, 5000);
 
+            // Mulit-core App clusters has been applied to better handle error
+            // as we can simply shut down 1 instance and re-start another to avoid
+            // whole-server shut down. Even with a single-thread, we still has
+            // the cluster master to restart the thread after shut down
             // disconnect from the cluster
             var worker = require('cluster').worker;
             if(worker) worker.disconnect();
@@ -48,16 +64,19 @@ app.use(function(req, res, next){
 
             try {
                 // attempt to use Express error route
+                // If we specified a error handler in the route, it is certaintly
+                // preferred as it is a more graceful way to handle error
                 next(err);
             } catch(error){
-                // if Express error route failed, try
-                // plain Node response
+                // if Express error route failed, we fall back to plain Node API
+                // response
                 console.error('Express error mechanism failed.\n', error.stack);
                 res.statusCode = 500;
                 res.setHeader('content-type', 'text/plain');
                 res.end('Server error.');
             }
         } catch(error){
+            // Epic erro even node can not handle, then trace the stack and time-out
             console.error('Unable to send 500 response.\n', error.stack);
         }
     });
@@ -391,6 +410,13 @@ app.use(function(err, req, res, next){
 	res.render('500');
 });
 
+/*
+ * Put the server instance initialization into 'startServer' function.
+ * If this script is run directly through node command, invoke startServer as
+ * single-thread application.
+ * - If this script is imported from a cluster-control script, export 'startServer'
+ * function and submit its control over.
+ */
 var server;
 
 function startServer() {

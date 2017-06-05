@@ -1,3 +1,10 @@
+/*
+ * Simulates case where 50 requests are fired under a second to check application's
+ * capacity. 
+ * This example utilize Mocha task configured in Grunt. See the result after
+ * a Grunt run.
+ */
+
 var loadtest = require('loadtest');
 var expect = require('chai').expect;
 
@@ -10,6 +17,7 @@ suite('Stress tests', function(){
               maxRequests: 50,
           };
           loadtest.loadTest(options, function(err,result){
+            // expect no errors, and toal response time under 1 second
             expect(!err);
             expect(result.totalTimeSeconds < 1);
             done();
