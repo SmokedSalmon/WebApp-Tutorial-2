@@ -85,6 +85,12 @@ switch(app.get('env')){
         break;
 }
 
+// Setting up session storage utilizing MongoDB
+// Please remember the dependency here: 
+//                                  cookie -> ┐ 
+//                                            ├-> session storage
+//      mongoose(mongoDB) -> session-mongoose ┘
+// Once setuped, session is availabe through req.session wherever req is accessable
 var MongoSessionStore = require('session-mongoose')(require('connect'));
 var sessionStore = new MongoSessionStore({ url: credentials.mongo[app.get('env')].connectionString });
 
@@ -116,7 +122,7 @@ switch(app.get('env')){
         throw new Error('Unknown execution environment: ' + app.get('env'));
 }
 
-// initialize vacations
+// initialize vacations, hard-code the data for demonsration only
 Vacation.find(function(err, vacations){
     if(vacations.length) return;
 
@@ -324,10 +330,13 @@ app.post('/contest/vacation-photo/:year/:month', function(req, res){
             return res.redirect(303, '/contest/vacation-photo');
         }
         var photo = files.photo;
+        // till here, the final directory is '/data/vacation-photo/:year/:month/
         var dir = vacationPhotoDir + '/' + Date.now();
         var path = dir + '/' + photo.name;
         fs.mkdirSync(dir);
+        // move the photo from app cache to destination storage?
         fs.renameSync(photo.path, dir + '/' + photo.name);
+        // storing file information into database, currently empty functionality
         saveContestEntry('vacation-photo', fields.email,
             req.params.year, req.params.month, path);
         req.session.flash = {
@@ -360,11 +369,16 @@ function convertFromUSD(value, currency){
     }
 }
 
+// Finds the vacations with filter "in season", then passes the result via context
+// to the view
 app.get('/vacations', function(req, res){
     Vacation.find({ available: true }, function(err, vacations){
     	var currency = req.session.currency || 'USD';
         var context = {
             currency: currency,
+            // REMEMBER NOT to pass the original database data object to the view
+            // as they always carry additional methods/handlers that view does not
+            // need. Map the required data to another object instead
             vacations: vacations.map(function(vacation){
                 return {
                     sku: vacation.sku,
