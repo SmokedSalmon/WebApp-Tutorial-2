@@ -6,6 +6,8 @@ var main = require('./handlers/main.js'),
 	contact = require('./handlers/contact.js'),
 	samples = require('./handlers/sample.js');
 
+// need to use the parameter "app" to receive the global Express instance, then
+// regisger all routing with it. 
 module.exports = function(app){
 
 	// miscellaneous routes

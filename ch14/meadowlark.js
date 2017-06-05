@@ -234,9 +234,20 @@ admin.get('/users', function(req, res){
 
 
 // add routes
+// Here uses "hard-coded" bundle with routing match and handler, which suits most application.
+// If you need to dynamically match the routing methods and handlers with database
+// or JSON, use following codes, with an adapted version of the "./routes.js":
+// var routes = require('./routes.js')();
+// routes.forEach(function(route){
+//     app[route.method](route.handler);
+// });
 require('./routes.js')(app);
 
 // add support for auto views
+// So certain views can be routed automaticcaly without allocating custom handler
+// for each of them. Similar to static html or other resource access
+// ======
+// custom cache for auto view
 var autoViews = {};
 
 app.use(function(req,res,next){
@@ -246,6 +257,7 @@ app.use(function(req,res,next){
     // if it's not in the cache, see if there's
     // a .handlebars file that matches
     if(fs.existsSync(__dirname + '/views' + path + '.handlebars')){
+        // found view, adds it to the autoView cache
         autoViews[path] = path.replace(/^\//, '');
         return res.render(autoViews[path]);
     }
