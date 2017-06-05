@@ -26,6 +26,7 @@ module.exports = function(grunt){
 		exec: {
 			linkchecker: { cmd: 'linkchecker --ignore-url=\'!^(https?:)\/\/localhost\b\' --ignore-url=/cart/add --no-warnings http://localhost:3000' }
 		},
+                // Defines the "static" helper for LESS to map static content in CSS
 		less: {
 			development: {
 				options: {
@@ -43,6 +44,8 @@ module.exports = function(grunt){
 				}
 			}
 		},
+                // bundle & minify all static javaScript files. ** in path means
+                // recursively search all subfolders
 		uglify: {
 			all: {
 				files: {
@@ -50,8 +53,11 @@ module.exports = function(grunt){
 				}
 			}
 		},
+                // bundle & minify all css files
 		cssmin: {
 			combine: {
+                                // note the 2nd element of the array with exclamation
+                                // says not to circularly include css files it generates
 				files: {
 					'public/css/meadowlark.css': ['public/css/**/*.css',
 					'!public/css/meadowlark*.css']
@@ -62,6 +68,10 @@ module.exports = function(grunt){
 				dest: 'public/css/meadowlark.min.css',
 			},
 		},
+                // Defines the which files to fingerprint, on what format, and the
+                // destination to update those new file name to.
+                // In this case, it choses 'config.js' as the staging point because
+                // that is where those files are waiting to be injecting to view context.
 		hashres: {
 			options: {
 				fileNameFormat: '${name}.${hash}.${ext}'
@@ -76,6 +86,11 @@ module.exports = function(grunt){
 				]
 			},
 		},
+                
+                // Defines patterns for static resource mapping error
+                // In specific, it scans regex pattern in <link>, <script> and
+                // <img> tags in the view(view_statics), and all the pre-compile
+                // CSS files in LESS format (css_statics)
 		lint_pattern: {
 			view_statics: {
 				options: {
@@ -94,29 +109,31 @@ module.exports = function(grunt){
 						},
 					]
 				},
-			files: {
-				src: [ 'views/**/*.handlebars' ]
-		   }
-		},
-		css_statics: {
-			options: {
-				rules: [
-					{
-						pattern: /url\(/,
-						message: 'Un-mapped static found in LESS property.'
-					},
-				]
-			},
-			files: {
-				src: [
-					'less/**/*.less'
-				]
-			}
-		}
-	 }
+                                files: {
+                                        src: [ 'views/**/*.handlebars' ]
+                                }
+                        },
+                        css_statics: {
+                                options: {
+                                        rules: [
+                                                {
+                                                        pattern: /url\(/,
+                                                        message: 'Un-mapped static found in LESS property.'
+                                                },
+                                        ]
+                                },
+                                files: {
+                                        src: [
+                                                'less/**/*.less'
+                                        ]
+                                }
+                        }
+                }
 	});	
 
 	// register tasks
+        // Adds pattern-linting for static resource mapping error
 	grunt.registerTask('default', ['cafemocha','jshint','exec', 'lint_pattern']);
+        // define the grunt task for static content processing
 	grunt.registerTask('static', ['less', 'cssmin', 'uglify', 'hashres']);
 };
