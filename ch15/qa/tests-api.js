@@ -16,7 +16,11 @@ suite('API tests', function(){
 
     var base = 'http://api.meadowlark:3000';
 
+    // First it varifies weather the API can handle entry creation
     test('should be able to add an attraction', function(done){
+        // use restler to issue an automatic REST request.
+        // Please notice that the first parameter - path - takes full URL, unlike
+        // Express' routing.
         rest.post(base+'/attraction', {data:attraction})
 			.on('success', function(data){
 				assert.match(data.id, /\w/, 'id must be set');
@@ -27,7 +31,9 @@ suite('API tests', function(){
 			});
 	
     });
-
+    
+    
+    // Now it varifies weather the data sent mataches the data retrieved by API
     test('should be able to retrieve an attraction', function(done){
         rest.post(base+'/attraction', {data:attraction}).on('success', function(data){
             rest.get(base+'/attraction/'+data.id)

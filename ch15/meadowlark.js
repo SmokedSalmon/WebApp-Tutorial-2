@@ -243,9 +243,23 @@ var Attraction = require('./models/attraction.js');
 
 var rest = require('connect-rest');
 
+// To use pure Express handler for REST, it is recommended to have a seperate route
+// prefix such as "/api/xxx" to disdinguish from other routing.
+// In this case, connect-rest module is used, where the routing prefix is pre-defined
+// during its configuration, by the "apiOption.context" parameter
+// ======
+// REST handler function takes 3 parameters : request object content/data object
+// and a callback function, compared to typical express route handler which takes
+// request, response and callback.
+// ======
+// To use the data returned by database, it is not recommended to pass the database
+// inquiry-result directly since it will expose implementation details. We construct
+// /map required data into a new object and then use it.
 rest.get('/attractions', function(req, content, cb){
     Attraction.find({ approved: true }, function(err, attractions){
         if(err) return cb({ error: 'Internal error.' });
+        // the callback function here act similarly to pure Express routing's
+        // "res.json(<model>.map(function(a){...})"
         cb(null, attractions.map(function(a){
             return {
                 name: a.name,
@@ -270,6 +284,8 @@ rest.post('/attraction', function(req, content, cb){
     });
     a.save(function(err, a){
         if(err) return cb({ error: 'Unable to add attraction.' });
+        // if no error, then the database entry's id will be returned via callback
+        // similar to pure Express routing's "res.json(<model>.map(function(a)..."
         cb(null, { id: a._id });
     }); 
 });
@@ -287,7 +303,9 @@ rest.get('/attraction/:id', function(req, content, cb){
 
 // API configuration
 var apiOptions = {
+    // routing prefix goes here, if VHOST is not applied, then '/api' is recommended
     context: '/',
+    // a dedicated error-handling domain for REST APIs.
     domain: require('domain').create(),
 };
 
@@ -302,7 +320,8 @@ apiOptions.domain.on('error', function(err){
     if(worker) worker.disconnect();
 });
 
-// link API into pipeline
+// link API into pipeline, using VHOST, so all REST routing works like:
+// "api.<doumain>.<REST Routing>"
 app.use(vhost('api.*', rest.rester(apiOptions)));
 
 // add support for auto views
