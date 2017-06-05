@@ -1,3 +1,9 @@
+/*
+ * Define the Model "customer"
+ * First defines the Schema and the methods
+ * Then attaches data persistance layer to the schema
+ */
+
 var mongoose = require('mongoose');
 var Order = require('./order.js');
 var customerSchema = mongoose.Schema({
@@ -19,5 +25,7 @@ var customerSchema = mongoose.Schema({
 customerSchema.methods.getOrders = function(cb){
 	return Order.find({ customerId: this._id }, cb);
 };
+
+// Attaches data persistance layer to the Schema, finalize the Model
 var Customer = mongoose.model('Customer', customerSchema);
 module.exports = Customer;

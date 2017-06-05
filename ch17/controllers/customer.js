@@ -1,6 +1,8 @@
 var Customer = require('../models/customer.js');
 var customerViewModel = require('../viewModels/customer.js');
 
+// By putting all route handlers within the export object, the namespace of this
+// controller is contained, a closure is contructed.
 module.exports = {
 
 	registerRoutes: function(app) {
@@ -74,6 +76,7 @@ module.exports = {
 		Customer.findById(req.params.id, function(err, customer) {
 			if(err) return next(err);
 			if(!customer) return next(); 	// pass this on to 404 handler
+                        // Some server-end validations for user inputs
 			if(req.body.firstName){
 				if(typeof req.body.firstName !== 'string' ||
 					req.body.firstName.trim() === '')

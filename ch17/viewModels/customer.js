@@ -1,3 +1,7 @@
+/*
+ * View-Modle of the Model "Customer"
+ */
+
 var Customer = require('../models/customer.js');
 
 // convenience function for joining fields
@@ -10,13 +14,18 @@ function smartJoin(arr, separator){
 	}).join(separator);
 }
 
+// Underscore.js is a utility-belt library for JavaScript that provides support
+// for the usual functional suspects (each, map, reduce, filter...) without
+// extending any core JavaScript objects.
+// In this case, it provides convenient method to manipulate javaScript Object.
 var _ = require('underscore');
 
 // get a customer view model
 // NOTE: readers of the book will notice that this function differs from the version
 // in the book.  Unfortunately, the version in the book is incorrect (Mongoose does not
-// oofer an asynchronous version of .findById).  My apologies to my readers.
+// offer an asynchronous version of .findById).  My apologies to my readers.
 function getCustomerViewModel(customer, orders){
+        // remove salsNotes information during this inquery of the a given Customer
 	var vm = _.omit(customer, 'salesNotes');
 	return _.extend(vm, {
 		name: smartJoin([vm.firstName, vm.lastName]),
@@ -27,6 +36,7 @@ function getCustomerViewModel(customer, orders){
 				customer.state + ' ' + 
 				customer.zip,
 		], '<br>'),
+                // Join data from other Model
 		orders: orders.map(function(order){
 			return {
 				orderNumber: order.orderNumber,
